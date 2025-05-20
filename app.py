@@ -1,42 +1,36 @@
 from flask import Flask, request
-import requests
 from twilio.twiml.messaging_response import MessagingResponse
-from gogglesearch import search
+from googlesearch import search
 
-app = Flask(__name__) #creates an instance of the flask 
+app = Flask(__name__)  # creates an instance of the flask app
 
 # route for handling incoming messages from Twilio
-@app.route("/", methods=["POST"]) #twilio will send message to this route
+@app.route("/", methods=["POST"])  # Twilio will send messages to this route
 def bot():
-
-    # extracts the users message from the incoming request. body contains the message text
-    user_msg = request.values.get('Body', '').lower()
-
-
-    # if the user message is empty, return a default response
-    if not user_msg:
-        return "Please send a message."
-    else:
-        print(user_msg)
+    # Create a Twilio MessagingResponse object
     response = MessagingResponse()
 
-    # appends "geeksforgeeks.org" to the user message and searches for it
-    # using the search function from the googlesearch module
-    q = user_msg + " geeksforgeeks.org"
-    search_results = []
+    # Extract the user's message from the incoming request
+    user_msg = request.values.get('Body', '').lower()
 
-    for i in search(q, num_results=5):
-        search_results.append(i)
+    # Respond to "hello" or "hi"
+    if user_msg == "hello" or user_msg == "hi":
+        msg = response.message("Hello Anthony, what's up?")
+    else:
+        # Append "geeksforgeeks.org" to the user's message and search for it
+        q = user_msg + " geeksforgeeks.org"
+        search_results = [result for result in search(q, num_results=5)]
 
-    msg = response.message(f"--- Results for '{user_msg}' ---")
+        # Add a header message
+        response.message(f"--- Results for '{user_msg}' ---")
 
-    # loops and sends each url as a separate message to the user
-    for result in search_results:
-        msg = response.message(result)
+        # Loop and send each URL as a separate message
+        for result in search_results:
+            response.message(result)
 
-    # sends the response back to Twilio
-    # Twilio will send the response to the user
+    # Send the response back to Twilio
     return str(response)
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
