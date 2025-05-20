@@ -2,9 +2,12 @@ from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 from googlesearch import search
 
+# messaging_response is used to create a response for whatsapp
+# search is used to perform google search
+
 app = Flask(__name__)  # creates an instance of the flask app
 
-# route for handling incoming messages from Twilio
+# route for handling incoming messages from Twilio/will send messages to this route
 @app.route("/", methods=["POST"])  # Twilio will send messages to this route
 def bot():
     # Create a Twilio MessagingResponse object
